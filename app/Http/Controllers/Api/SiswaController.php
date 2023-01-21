@@ -47,4 +47,10 @@ class SiswaController extends Controller
         // kembalikan pesan dan resource
         return new SiswaResource(true, 'Siswa Berhasil Ditambahkan', $siswa);
     }
+
+    public function show(Siswa $siswa)
+    {
+        // kembalikan 1 data siswa
+        return new SiswaResource(true, "Data Siswa Ditemukan", $siswa);
+    }
 }
