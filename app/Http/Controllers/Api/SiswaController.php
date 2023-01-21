@@ -94,4 +94,16 @@ class SiswaController extends Controller
         // kembalikan response data
         return new SiswaResource(true, "Data Siswa Diubah", $siswa);
     }
+
+    public function destroy(Siswa $siswa)
+    {
+        // hapus gambar dari folder siswa
+        Storage::delete('public/siswa' . $siswa->foto);
+
+        // hapus data siswa
+        $siswa->delete();
+
+        // kembalikan response
+        return new SiswaResource(true, "Data Berhasil Dihapus", null);
+    }
 }
