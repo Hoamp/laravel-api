@@ -6,6 +6,7 @@ use App\Models\Siswa;
 use App\Http\Resources\SiswaResource;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class SiswaController extends Controller
@@ -52,5 +53,45 @@ class SiswaController extends Controller
     {
         // kembalikan 1 data siswa
         return new SiswaResource(true, "Data Siswa Ditemukan", $siswa);
+    }
+
+    public function update(Request $request, Siswa $siswa)
+    {
+        // validasi tanpa foto
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required',
+            'nis' => 'required'
+        ]);
+
+        // jika validasi gagal
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // cek gambar
+        if ($request->hasFile('foto')) {
+            // upload gambar
+            $foto = $request->file('foto');
+            $foto->storeAs('public/siswa', $foto->hashName());
+
+            // hapus gambar lama
+            Storage::delete('public/siswa' . $foto->hashName());
+
+            // update data siswa
+            $siswa->update([
+                'foto' => $foto->hashName(),
+                'nama' => $request->nama,
+                'nis' => $request->nis
+            ]);
+        } else {
+            // updata tanpa upload gambar
+            $siswa->update([
+                'nama' => $request->nama,
+                'nis' => $request->nis
+            ]);
+        }
+
+        // kembalikan response data
+        return new SiswaResource(true, "Data Siswa Diubah", $siswa);
     }
 }
